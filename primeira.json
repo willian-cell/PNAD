@@ -1,0 +1,51 @@
+{
+  "fonte": {
+    "ibge_painel_indicadores": "IBGE › Painel de Indicadores › Escolarização (6–14) e Analfabetismo (15+)",
+    "pnad_continua_educacao_release": "IBGE › Agência de Notícias › PNAD Contínua: Educação 2024 (release e tabelas)",
+    "ibge_brasil_em_sintese_2007_2015": "IBGE › Brasil em Síntese › Escolarização 6–14 (2007–2015)"
+  },
+  "periodo": ["2015","2016","2017","2018","2019","2020","2021","2022","2023","2024"],
+  "indicadores": {
+    "taxa_analfabetismo_15_ou_mais_percent": {
+      "2015": null,
+      "2016": 6.7,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": null,
+      "2023": 5.4,
+      "2024": 5.3
+    },
+    "taxa_escolarizacao_6_a_14_percent": {
+      "2015": 98.6,
+      "2016": null,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": 99.4,
+      "2023": 99.4,
+      "2024": 99.5
+    },
+    "taxa_ajustada_frequencia_liquida_ensino_fundamental_6_a_14_percent": {
+      "2015": null,
+      "2016": 68.2,
+      "2017": 68.4,
+      "2018": 69.2,
+      "2019": 71.3,
+      "2020": null,
+      "2021": null,
+      "2022": 75.2,
+      "2023": 75.0,
+      "2024": 76.7
+    }
+  },
+  "observacoes": [
+    "A série do módulo Educação da PNAD Contínua não teve a mesma cobertura em 2020–2021 por ajustes de questionário na pandemia; por isso há lacunas.",
+    "A taxa de escolarização 6–14 de 2015 provém da PNAD (pesquisa antiga) e, a partir de 2016, da PNAD Contínua; há quebra metodológica.",
+    "As taxas de 2023–2024 de escolarização (6–14) e analfabetismo (15+) são do Painel de Indicadores do IBGE; a taxa ajustada líquida 6–14 (fundamental) vem do release PNAD Contínua Educação 2024."
+  ]
+}

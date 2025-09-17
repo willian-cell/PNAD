@@ -1,0 +1,11 @@
+# 1) listar todas as provas
+python enem_api.py exams
+
+# 2) pegar a prova de 2020 ou expecifica
+python enem_api.py exam --year 2020
+
+# 3) listar questões com filtros (ajuste de acordo com a doc do endpoint)
+python enem_api.py questions --year 2020 --discipline ciencias-humanas --language ingles --page 1
+
+# 4) buscar uma questão específica por id
+python enem_api.py question --id 12345

@@ -1,0 +1,161 @@
+{
+  "fonte": {
+    "ibge_release_educacao_2024_pdf": "Agência IBGE — PNAD Contínua: Educação 2024 (release e tabelas)",
+    "ibge_painel_indicadores": "Painel de Indicadores IBGE — PNAD Contínua (Analfabetismo, Escolarização)",
+    "observacao": "Em 2020–2021 houve restrições no módulo de Educação (coleta por telefone)."
+  },
+  "periodo_referencia": ["2015","2016","2017","2018","2019","2020","2021","2022","2023","2024"],
+  "indicadores_brasil": {
+    "taxa_analfabetismo_15mais_percent": {
+      "2015": null,
+      "2016": 6.7,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": null,
+      "2023": 5.4,
+      "2024": 5.3
+    },
+    "taxa_escolarizacao_6a14_percent": {
+      "2015": 98.6,
+      "2016": null,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": 99.4,
+      "2023": 99.4,
+      "2024": 99.5
+    },
+    "taxa_escolarizacao_15a17_percent": {
+      "2015": null,
+      "2016": 86.9,
+      "2017": 86.9,
+      "2018": 87.9,
+      "2019": 89.0,
+      "2020": null,
+      "2021": null,
+      "2022": 92.2,
+      "2023": 91.9,
+      "2024": 93.4
+    },
+    "taxa_ajustada_frequencia_liquida_ensino_medio_15a17_percent": {
+      "2015": null,
+      "2016": 68.2,
+      "2017": 68.4,
+      "2018": 69.2,
+      "2019": 71.3,
+      "2020": null,
+      "2021": null,
+      "2022": 75.2,
+      "2023": 75.0,
+      "2024": 76.7
+    },
+    "taxa_ajustada_frequencia_liquida_ensino_fundamental_6a14_percent": {
+      "2015": null,
+      "2016": null,
+      "2017": null,
+      "2018": null,
+      "2019": 71.3,
+      "2020": null,
+      "2021": null,
+      "2022": 75.2,
+      "2023": 75.0,
+      "2024": 76.7
+    },
+    "educacao_infantil_taxa_escolarizacao_4a5_percent": {
+      "2016": 90.0,
+      "2019": 93.0,
+      "2022": 93.0,
+      "2023": 93.0,
+      "2024": 93.4
+    },
+    "ensino_superior_18a24_taxa_ajustada_frequencia_liquida_percent": {
+      "2015": null,
+      "2016": null,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": null,
+      "2023": null,
+      "2024": 27.1
+    },
+    "neet_15a29_percent_nao_trabalha_nem_estuda_nem_se_qualifica": {
+      "2015": null,
+      "2016": null,
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null,
+      "2022": null,
+      "2023": null,
+      "2024": 18.5
+    }
+  },
+  "recortes_2024": {
+    "analfabetismo_15mais_por_regiao_percent": {
+      "norte": 6.0,
+      "nordeste": 11.1,
+      "sudeste": 2.8,
+      "sul": 2.7,
+      "centro_oeste": 3.3,
+      "brasil": 5.3
+    },
+    "ensino_medio_15a17_taxa_ajustada_frequencia_liquida_por_regiao_percent": {
+      "norte": 69.8,
+      "nordeste": 73.9,
+      "sudeste": 80.8,
+      "sul": 76.7,
+      "centro_oeste": 77.4,
+      "brasil": 76.7
+    },
+    "ensino_superior_18a24_taxa_ajustada_frequencia_liquida_por_cor_ou_raca_percent": {
+      "branca": 37.4,
+      "preta_ou_parda": 20.6,
+      "total": 27.1
+    },
+    "situacao_educacional_18a24_percent": {
+      "frequencia_escolar_adequada": 27.1,
+      "atraso_escolar": 4.1,
+      "nao_frequenta_e_ja_concluiu_a_etapa": 4.2,
+      "nao_frequenta_e_nao_concluiu_a_etapa": 64.6
+    },
+    "educacao_profissional": {
+      "com_EM_concluido_ou_ingressado_sem_concluir_e_fora_da_graduacao": {
+        "frequenta_curso_tecnico_ou_normal_percent": 5.8,
+        "ja_concluiu_curso_tecnico_ou_normal_percent": 10.1
+      },
+      "qualificacao_profissional_14mais_percent": 0.8
+    }
+  },
+  "metas_pne_status_2024": {
+    "meta_3_ensino_medio_15a17_taxa_liquida_85_percent": {
+      "alvo_ate_2024": 85.0,
+      "observado_2024": 76.7,
+      "status": "abaixo_da_meta"
+    },
+    "meta_12_ensino_superior_18a24_taxa_liquida_33_percent": {
+      "alvo_ate_2024": 33.0,
+      "observado_2024_total": 27.1,
+      "observado_2024_brancos": 37.4,
+      "status_total": "abaixo_da_meta",
+      "observacao": "alvo atingido apenas entre pessoas brancas"
+    },
+    "meta_9_analfabetismo_15mais_ate_6_5_percent": {
+      "alvo": 6.5,
+      "observado_2024": 5.3,
+      "status": "atingida"
+    }
+  },
+  "notas_metodologicas": [
+    "Série 2015–2024: onde não há dado, retornou-se null (ex.: 2020–2021).",
+    "Taxa ajustada de frequência escolar líquida: inclui quem está na etapa prevista pela idade e quem já concluiu a etapa e cursa a seguinte.",
+    "Indicadores por cor/raça usam categorias IBGE (branca; preta ou parda)."
+  ]
+}
