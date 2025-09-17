@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Dados Educacionais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        .data-card {
+            transition: all 0.3s ease;
+        }
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-indigo-700 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold">Dados Educacionais Brasil</h1>
+                        <p class="text-indigo-200">Visualização interativa de indicadores do PNAD - IBGE</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <p>Dados .json</p>
+                        <button onclick="exportData()" class="p-2 rounded-full hover:bg-indigo-600">
+                            <i data-feather="download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Data Source Info -->
+            <section class="mb-12 bg-white rounded-lg shadow-md p-6" data-aos="fade-up">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-800">
+                    <i data-feather="info" class="inline mr-2"></i> Fonte dos Dados
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <h3 class="font-medium text-indigo-700 mb-2">Fontes Primárias</h3>
+                        <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                            <li>Agência IBGE — PNAD Contínua: Educação 2024 (release e tabelas)</li>
+                            <li>Painel de Indicadores IBGE — PNAD Contínua (Analfabetismo, Escolarização)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h3 class="font-medium text-yellow-700 mb-2">Observações</h3>
+                        <p class="text-gray-700">Em 2020–2021 houve restrições no módulo de Educação (coleta por telefone).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Series Charts -->
+            <section class="mb-12" data-aos="fade-up">
+                <h2 class="text-2xl font-semibold mb-6 text-indigo-800">
+                    <i data-feather="trending-up" class="inline mr-2"></i> Evolução Temporal dos Indicadores
+                </h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Taxa de Analfabetismo (15+ anos)</h3>
+                        <div class="chart-container">
+                            <canvas id="analfabetismoChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Taxa de Escolarização (6-14 anos)</h3>
+                        <div class="chart-container">
+                            <canvas id="escolarizacao6a14Chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Taxa de Escolarização (15-17 anos)</h3>
+                        <div class="chart-container">
+                            <canvas id="escolarizacao15a17Chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Frequência Líquida no Ensino Médio (15-17 anos)</h3>
+                        <div class="chart-container">
+                            <canvas id="frequenciaMediaChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Regional Data -->
+            <section class="mb-12" data-aos="fade-up">
+                <h2 class="text-2xl font-semibold mb-6 text-indigo-800">
+                    <i data-feather="map" class="inline mr-2"></i> Dados Regionais (2024)
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Analfabetismo por Região (%)</h3>
+                        <div class="chart-container">
+                            <canvas id="analfabetismoRegionalChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-4 text-gray-800">Frequência Líquida no Ensino Médio por Região (%)</h3>
+                        <div class="chart-container">
+                            <canvas id="frequenciaMediaRegionalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PNE Goals -->
+            <section class="mb-12" data-aos="fade-up">
+                <h2 class="text-2xl font-semibold mb-6 text-indigo-800">
+                    <i data-feather="target" class="inline mr-2"></i> Metas do Plano Nacional de Educação
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <i data-feather="check" class="text-green-600"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-800">Meta 9: Analfabetismo</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Reduzir a taxa de analfabetismo para 6,5% até 2024</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-2xl font-bold text-green-600">5.3%</span>
+                                <span class="text-gray-500 ml-1">(2024)</span>
+                            </div>
+                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Meta atingida</span>
+                        </div>
+                    </div>
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                <i data-feather="x" class="text-red-600"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-800">Meta 3: Ensino Médio</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Taxa líquida de 85% no ensino médio até 2024</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-2xl font-bold text-red-600">76.7%</span>
+                                <span class="text-gray-500 ml-1">(2024)</span>
+                            </div>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">Abaixo da meta</span>
+                        </div>
+                    </div>
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                <i data-feather="alert-circle" class="text-yellow-600"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-800">Meta 12: Ensino Superior</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Taxa líquida de 33% no ensino superior até 2024</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-2xl font-bold text-yellow-600">27.1%</span>
+                                <span class="text-gray-500 ml-1">(2024)</span>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Parcial</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Meta atingida apenas entre pessoas brancas (37.4%)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional Indicators -->
+            <section class="mb-12" data-aos="fade-up">
+                <h2 class="text-2xl font-semibold mb-6 text-indigo-800">
+                    <i data-feather="bar-chart-2" class="inline mr-2"></i> Outros Indicadores Relevantes
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-2 text-gray-800">NEET (15-29 anos)</h3>
+                        <p class="text-gray-600 mb-4">Não trabalha, não estuda e não se qualifica</p>
+                        <div class="flex items-end">
+                            <span class="text-3xl font-bold text-indigo-600">18.5%</span>
+                            <span class="text-gray-500 ml-2 mb-1">(2024)</span>
+                        </div>
+                    </div>
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-2 text-gray-800">Educação Profissional</h3>
+                        <p class="text-gray-600 mb-2">Frequenta curso técnico ou normal</p>
+                        <div class="flex items-end mb-3">
+                            <span class="text-2xl font-bold text-indigo-600">5.8%</span>
+                        </div>
+                        <p class="text-gray-600 mb-2">Já concluiu curso técnico ou normal</p>
+                        <div class="flex items-end">
+                            <span class="text-2xl font-bold text-indigo-600">10.1%</span>
+                        </div>
+                    </div>
+                    <div class="data-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-medium mb-2 text-gray-800">Situação Educacional (18-24 anos)</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Frequência adequada</span>
+                                <span class="font-medium">27.1%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Atraso escolar</span>
+                                <span class="font-medium">4.1%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Concluiu a etapa</span>
+                                <span class="font-medium">4.2%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Não frequenta/não concluiu</span>
+                                <span class="font-medium">64.6%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold mb-2">Dados Educacionais Brasil</h3>
+                        <p class="text-gray-400">Visualização interativa de indicadores do IBGE</p>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/willian-cell/PNAD.git" class="text-gray-400 hover:text-white">
+                            <i data-feather="github"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="whatzap"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                    <p>© 2024 Visualizador de Dados Educacionais. Todos os direitos reservados.</p>
+                    <p class="mt-2">Dados obtidos do IBGE - Pesquisa Nacional por Amostra de Domicílios Contínua (PNAD Contínua)</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Sample JSON data (in a real app, this would come from an API)
+        const educationData = {
+            "fonte": {
+                "ibge_release_educacao_2024_pdf": "Agência IBGE — PNAD Contínua: Educação 2024 (release e tabelas)",
+                "ibge_painel_indicadores": "Painel de Indicadores IBGE — PNAD Contínua (Analfabetismo, Escolarização)",
+                "observacao": "Em 2020–2021 houve restrições no módulo de Educação (coleta por telefone)."
+            },
+            "periodo_referencia": ["2015","2016","2017","2018","2019","2020","2021","2022","2023","2024"],
+            "indicadores_brasil": {
+                "taxa_analfabetismo_15mais_percent": {
+                    "2015": null,
+                    "2016": 6.7,
+                    "2017": null,
+                    "2018": null,
+                    "2019": null,
+                    "2020": null,
+                    "2021": null,
+                    "2022": null,
+                    "2023": 5.4,
+                    "2024": 5.3
+                },
+                "taxa_escolarizacao_6a14_percent": {
+                    "2015": 98.6,
+                    "2016": null,
+                    "2017": null,
+                    "2018": null,
+                    "2019": null,
+                    "2020": null,
+                    "2021": null,
+                    "2022": 99.4,
+                    "2023": 99.4,
+                    "2024": 99.5
+                },
+                "taxa_escolarizacao_15a17_percent": {
+                    "2015": null,
+                    "2016": 86.9,
+                    "2017": 86.9,
+                    "2018": 87.9,
+                    "2019": 89.0,
+                    "2020": null,
+                    "2021": null,
+                    "2022": 92.2,
+                    "2023": 91.9,
+                    "2024": 93.4
+                },
+                "taxa_ajustada_frequencia_liquida_ensino_medio_15a17_percent": {
+                    "2015": null,
+                    "2016": 68.2,
+                    "2017": 68.4,
+                    "2018": 69.2,
+                    "2019": 71.3,
+                    "2020": null,
+                    "2021": null,
+                    "2022": 75.2,
+                    "2023": 75.0,
+                    "2024": 76.7
+                },
+                "taxa_ajustada_frequencia_liquida_ensino_fundamental_6a14_percent": {
+                    "2015": null,
+                    "2016": null,
+                    "2017": null,
+                    "2018": null,
+                    "2019": 71.3,
+                    "2020": null,
+                    "2021": null,
+                    "2022": 75.2,
+                    "2023": 75.0,
+                    "2024": 76.7
+                },
+                "educacao_infantil_taxa_escolarizacao_4a5_percent": {
+                    "2016": 90.0,
+                    "2019": 93.0,
+                    "2022": 93.0,
+                    "2023": 93.0,
+                    "2024": 93.4
+                },
+                "ensino_superior_18a24_taxa_ajustada_frequencia_liquida_percent": {
+                    "2015": null,
+                    "2016": null,
+                    "2017": null,
+                    "2018": null,
+                    "2019": null,
+                    "2020": null,
+                    "2021": null,
+                    "2022": null,
+                    "2023": null,
+                    "2024": 27.1
+                },
+                "neet_15a29_percent_nao_trabalha_nem_estuda_nem_se_qualifica": {
+                    "2015": null,
+                    "2016": null,
+                    "2017": null,
+                    "2018": null,
+                    "2019": null,
+                    "2020": null,
+                    "2021": null,
+                    "2022": null,
+                    "2023": null,
+                    "2024": 18.5
+                }
+            },
+            "recortes_2024": {
+                "analfabetismo_15mais_por_regiao_percent": {
+                    "norte": 6.0,
+                    "nordeste": 11.1,
+                    "sudeste": 2.8,
+                    "sul": 2.7,
+                    "centro_oeste": 3.3,
+                    "brasil": 5.3
+                },
+                "ensino_medio_15a17_taxa_ajustada_frequencia_liquida_por_regiao_percent": {
+                    "norte": 69.8,
+                    "nordeste": 73.9,
+                    "sudeste": 80.8,
+                    "sul": 76.7,
+                    "centro_oeste": 77.4,
+                    "brasil": 76.7
+                },
+                "ensino_superior_18a24_taxa_ajustada_frequencia_liquida_por_cor_ou_raca_percent": {
+                    "branca": 37.4,
+                    "preta_ou_parda": 20.6,
+                    "total": 27.1
+                },
+                "situacao_educacional_18a24_percent": {
+                    "frequencia_escolar_adequada": 27.1,
+                    "atraso_escolar": 4.1,
+                    "nao_frequenta_e_ja_concluiu_a_etapa": 4.2,
+                    "nao_frequenta_e_nao_concluiu_a_etapa": 64.6
+                },
+                "educacao_profissional": {
+                    "com_EM_concluido_ou_ingressado_sem_concluir_e_fora_da_graduacao": {
+                        "frequenta_curso_tecnico_ou_normal_percent": 5.8,
+                        "ja_concluiu_curso_tecnico_ou_normal_percent": 10.1
+                    },
+                    "qualificacao_profissional_14mais_percent": 0.8
+                }
+            },
+            "metas_pne_status_2024": {
+                "meta_3_ensino_medio_15a17_taxa_liquida_85_percent": {
+                    "alvo_ate_2024": 85.0,
+                    "observado_2024": 76.7,
+                    "status": "abaixo_da_meta"
+                },
+                "meta_12_ensino_superior_18a24_taxa_liquida_33_percent": {
+                    "alvo_ate_2024": 33.0,
+                    "observado_2024_total": 27.1,
+                    "observado_2024_brancos": 37.4,
+                    "status_total": "abaixo_da_meta",
+                    "observacao": "alvo atingido apenas entre pessoas brancas"
+                },
+                "meta_9_analfabetismo_15mais_ate_6_5_percent": {
+                    "alvo": 6.5,
+                    "observado_2024": 5.3,
+                    "status": "atingida"
+                }
+            },
+            "notas_metodologicas": [
+                "Série 2015–2024: onde não há dado, retornou-se null (ex.: 2020–2021).",
+                "Taxa ajustada de frequência escolar líquida: inclui quem está na etapa prevista pela idade e quem já concluiu a etapa e cursa a seguinte.",
+                "Indicadores por cor/raça usam categorias IBGE (branca; preta ou parda)."
+            ]
+        };
+
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Initialize Feather Icons
+        feather.replace();
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        }
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Export data function
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(educationData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "dados-educacionais-brasil.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Helper function to create time series chart
+        function createTimeSeriesChart(canvasId, dataKey, label, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const years = educationData.periodo_referencia;
+            const dataPoints = years.map(year => educationData.indicadores_brasil[dataKey][year]);
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: label,
+                        data: dataPoints,
+                        backgroundColor: `rgba(${color}, 0.1)`,
+                        borderColor: `rgba(${color}, 1)`,
+                        borderWidth: 2,
+                        pointBackgroundColor: `rgba(${color}, 1)`,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + (context.raw !== null ? context.raw + '%' : 'Dado não disponível');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: function(context) {
+                                const minValue = Math.min(...context.chart.data.datasets[0].data.filter(v => v !== null));
+                                return Math.max(0, Math.floor(minValue - 5));
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Helper function to create bar chart
+        function createBarChart(canvasId, dataObj, label, colors) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = Object.keys(dataObj).filter(key => key !== 'brasil' && key !== 'total');
+            const data = labels.map(label => dataObj[label]);
+            
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.map(label => {
+                        // Format label names
+                        if (label === 'norte') return 'Norte';
+                        if (label === 'nordeste') return 'Nordeste';
+                        if (label === 'sudeste') return 'Sudeste';
+                        if (label === 'sul') return 'Sul';
+                        if (label === 'centro_oeste') return 'Centro-Oeste';
+                        return label;
+                    }),
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.6', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create all charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Time series charts
+            createTimeSeriesChart('analfabetismoChart', 'taxa_analfabetismo_15mais_percent', 'Taxa de Analfabetismo (15+ anos)', '75, 192, 192');
+            createTimeSeriesChart('escolarizacao6a14Chart', 'taxa_escolarizacao_6a14_percent', 'Taxa de Escolarização (6-14 anos)', '54, 162, 235');
+            createTimeSeriesChart('escolarizacao15a17Chart', 'taxa_escolarizacao_15a17_percent', 'Taxa de Escolarização (15-17 anos)', '153, 102, 255');
+            createTimeSeriesChart('frequenciaMediaChart', 'taxa_ajustada_frequencia_liquida_ensino_medio_15a17_percent', 'Frequência Líquida no Ensino Médio (15-17 anos)', '255, 159, 64');
+
+            // Regional charts
+            createBarChart('analfabetismoRegionalChart', educationData.recortes_2024.analfabetismo_15mais_por_regiao_percent, 'Taxa de Analfabetismo por Região (%)', [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)'
+            ]);
+
+            createBarChart('frequenciaMediaRegionalChart', educationData.recortes_2024.ensino_medio_15a17_taxa_ajustada_frequencia_liquida_por_regiao_percent, 'Frequência Líquida no Ensino Médio por Região (%)', [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)'
+            ]);
+        });
+    </script>
+</body>
+</html>
